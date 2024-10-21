@@ -510,13 +510,13 @@ int sx1302_radio_calibrate(struct lgw_conf_rxrf_s * context_rf_chain, uint8_t cl
     /* -- Reset radios */
     for (i = 0; i < LGW_RF_CHAIN_NB; i++) {
         if (context_rf_chain[i].enable == true) {
-            err = sx1302_radio_reset(i, context_rf_chain[i].type);
+            err = sx1302_radio_reset(i, context_rf_chain[i].radio_type);
             if (err != LGW_REG_SUCCESS) {
                 printf("ERROR: failed to reset radio %d\n", i);
                 return LGW_REG_ERROR;
             }
 
-            err = sx1302_radio_set_mode(i, context_rf_chain[i].type);
+            err = sx1302_radio_set_mode(i, context_rf_chain[i].radio_type);
             if (err != LGW_REG_SUCCESS) {
                 printf("ERROR: failed to set radio %d mode\n", i);
                 return LGW_REG_ERROR;
@@ -535,8 +535,8 @@ int sx1302_radio_calibrate(struct lgw_conf_rxrf_s * context_rf_chain, uint8_t cl
     err |= lgw_reg_w(SX1302_REG_AGC_MCU_RF_EN_A_PA_EN, 0);
     err |= lgw_reg_w(SX1302_REG_AGC_MCU_RF_EN_A_LNA_EN, 0);
     /* -- Start calibration */
-    if ((context_rf_chain[clksrc].type == LGW_RADIO_TYPE_SX1257) ||
-        (context_rf_chain[clksrc].type == LGW_RADIO_TYPE_SX1255)) {
+    if ((context_rf_chain[clksrc].radio_type == LGW_RADIO_TYPE_SX1257) ||
+        (context_rf_chain[clksrc].radio_type == LGW_RADIO_TYPE_SX1255)) {
         DEBUG_MSG("Loading CAL fw for sx125x\n");
         err = sx1302_agc_load_firmware(cal_firmware_sx125x);
         if (err != LGW_REG_SUCCESS) {
@@ -546,8 +546,8 @@ int sx1302_radio_calibrate(struct lgw_conf_rxrf_s * context_rf_chain, uint8_t cl
         err = sx1302_cal_start(FW_VERSION_CAL, context_rf_chain, txgain_lut);
         if (err != LGW_REG_SUCCESS) {
             printf("ERROR: radio calibration failed\n");
-            sx1302_radio_reset(0, context_rf_chain[0].type);
-            sx1302_radio_reset(1, context_rf_chain[1].type);
+            sx1302_radio_reset(0, context_rf_chain[0].radio_type);
+            sx1302_radio_reset(1, context_rf_chain[1].radio_type);
             return LGW_REG_ERROR;
         }
     } else {

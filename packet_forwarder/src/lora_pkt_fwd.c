@@ -687,11 +687,11 @@ static int parse_SX130x_configuration(const char * conf_file) {
             snprintf(param_name, sizeof param_name, "radio_%i.type", i);
             str = json_object_dotget_string(conf_obj, param_name);
             if (!strncmp(str, "SX1255", 6)) {
-                rfconf.type = LGW_RADIO_TYPE_SX1255;
+                rfconf.radio_type = LGW_RADIO_TYPE_SX1255;
             } else if (!strncmp(str, "SX1257", 6)) {
-                rfconf.type = LGW_RADIO_TYPE_SX1257;
+                rfconf.radio_type = LGW_RADIO_TYPE_SX1257;
             } else if (!strncmp(str, "SX1250", 6)) {
-                rfconf.type = LGW_RADIO_TYPE_SX1250;
+                rfconf.radio_type = LGW_RADIO_TYPE_SX1250;
             } else {
                 MSG("WARNING: invalid radio type: %s (should be SX1255 or SX1257 or SX1250)\n", str);
             }

@@ -504,8 +504,8 @@ int lgw_rxrf_setconf(uint8_t rf_chain, struct lgw_conf_rxrf_s * conf) {
     }
 
     /* check if radio type is supported */
-    if ((conf->type != LGW_RADIO_TYPE_SX1255) && (conf->type != LGW_RADIO_TYPE_SX1257) && (conf->type != LGW_RADIO_TYPE_SX1250)) {
-        DEBUG_PRINTF("ERROR: NOT A VALID RADIO TYPE (%d)\n", conf->type);
+    if ((conf->radio_type != LGW_RADIO_TYPE_SX1255) && (conf->radio_type != LGW_RADIO_TYPE_SX1257) && (conf->radio_type != LGW_RADIO_TYPE_SX1250)) {
+        DEBUG_PRINTF("ERROR: NOT A VALID RADIO TYPE (%d)\n", conf->radio_type);
         return LGW_HAL_ERROR;
     }
 
@@ -524,7 +524,7 @@ int lgw_rxrf_setconf(uint8_t rf_chain, struct lgw_conf_rxrf_s * conf) {
     CONTEXT_RF_CHAIN[rf_chain].rssi_tcomp.coeff_c = conf->rssi_tcomp.coeff_c;
     CONTEXT_RF_CHAIN[rf_chain].rssi_tcomp.coeff_d = conf->rssi_tcomp.coeff_d;
     CONTEXT_RF_CHAIN[rf_chain].rssi_tcomp.coeff_e = conf->rssi_tcomp.coeff_e;
-    CONTEXT_RF_CHAIN[rf_chain].type = conf->type;
+    CONTEXT_RF_CHAIN[rf_chain].radio_type = conf->radio_type;
     CONTEXT_RF_CHAIN[rf_chain].tx_enable = conf->tx_enable;
     CONTEXT_RF_CHAIN[rf_chain].single_input_mode = conf->single_input_mode;
 
@@ -532,7 +532,7 @@ int lgw_rxrf_setconf(uint8_t rf_chain, struct lgw_conf_rxrf_s * conf) {
                                                                                                                 CONTEXT_RF_CHAIN[rf_chain].enable,
                                                                                                                 CONTEXT_RF_CHAIN[rf_chain].freq_hz,
                                                                                                                 CONTEXT_RF_CHAIN[rf_chain].rssi_offset,
-                                                                                                                CONTEXT_RF_CHAIN[rf_chain].type,
+                                                                                                                CONTEXT_RF_CHAIN[rf_chain].radio_type,
                                                                                                                 CONTEXT_RF_CHAIN[rf_chain].tx_enable,
                                                                                                                 CONTEXT_RF_CHAIN[rf_chain].single_input_mode);
 
@@ -849,7 +849,6 @@ int lgw_start(void) {
     int i, err;
     uint8_t fw_version_agc;
 
-    DEBUG_PRINTF(" --- %s\n", "IN");
 
     if (CONTEXT_STARTED == true) {
         DEBUG_MSG("Note: LoRa concentrator already started, restarting it now\n");
@@ -879,20 +878,20 @@ int lgw_start(void) {
     for (i = 0; i < LGW_RF_CHAIN_NB; i++) {
         if (CONTEXT_RF_CHAIN[i].enable == true) {
             /* Reset the radio */
-            err = sx1302_radio_reset(i, CONTEXT_RF_CHAIN[i].type);
+            err = sx1302_radio_reset(i, CONTEXT_RF_CHAIN[i].radio_type);
             if (err != LGW_REG_SUCCESS) {
                 printf("ERROR: failed to reset radio %d\n", i);
                 return LGW_HAL_ERROR;
             }
 
             /* Setup the radio */
-            switch (CONTEXT_RF_CHAIN[i].type) {
+            switch (CONTEXT_RF_CHAIN[i].radio_type) {
                 case LGW_RADIO_TYPE_SX1250:
                     err = sx1250_setup(i, CONTEXT_RF_CHAIN[i].freq_hz, CONTEXT_RF_CHAIN[i].single_input_mode);
                     break;
                 case LGW_RADIO_TYPE_SX1255:
                 case LGW_RADIO_TYPE_SX1257:
-                    err = sx125x_setup(i, CONTEXT_BOARD.clksrc, true, CONTEXT_RF_CHAIN[i].type, CONTEXT_RF_CHAIN[i].freq_hz);
+                    err = sx125x_setup(i, CONTEXT_BOARD.clksrc, true, CONTEXT_RF_CHAIN[i].radio_type, CONTEXT_RF_CHAIN[i].freq_hz);
                     break;
                 default:
                     printf("ERROR: RADIO TYPE NOT SUPPORTED (RF_CHAIN %d)\n", i);
@@ -904,7 +903,7 @@ int lgw_start(void) {
             }
 
             /* Set radio mode */
-            err = sx1302_radio_set_mode(i, CONTEXT_RF_CHAIN[i].type);
+            err = sx1302_radio_set_mode(i, CONTEXT_RF_CHAIN[i].radio_type);
             if (err != LGW_REG_SUCCESS) {
                 printf("ERROR: failed to set mode for radio %d\n", i);
                 return LGW_HAL_ERROR;
@@ -1004,7 +1003,7 @@ int lgw_start(void) {
     }
 
     /* Load AGC firmware */
-    switch (CONTEXT_RF_CHAIN[CONTEXT_BOARD.clksrc].type) {
+    switch (CONTEXT_RF_CHAIN[CONTEXT_BOARD.clksrc].radio_type) {
         case LGW_RADIO_TYPE_SX1250:
             DEBUG_MSG("Loading AGC fw for sx1250\n");
             err = sx1302_agc_load_firmware(agc_firmware_sx1250);
@@ -1025,10 +1024,10 @@ int lgw_start(void) {
             fw_version_agc = FW_VERSION_AGC_SX125X;
             break;
         default:
-            printf("ERROR: failed to load AGC firmware, radio type not supported (%d)\n", CONTEXT_RF_CHAIN[CONTEXT_BOARD.clksrc].type);
+            printf("ERROR: failed to load AGC firmware, radio type not supported (%d)\n", CONTEXT_RF_CHAIN[CONTEXT_BOARD.clksrc].radio_type);
             return LGW_HAL_ERROR;
     }
-    err = sx1302_agc_start(fw_version_agc, CONTEXT_RF_CHAIN[CONTEXT_BOARD.clksrc].type, SX1302_AGC_RADIO_GAIN_AUTO, SX1302_AGC_RADIO_GAIN_AUTO, CONTEXT_BOARD.full_duplex, CONTEXT_SX1261.lbt_conf.enable);
+    err = sx1302_agc_start(fw_version_agc, CONTEXT_RF_CHAIN[CONTEXT_BOARD.clksrc].radio_type, SX1302_AGC_RADIO_GAIN_AUTO, SX1302_AGC_RADIO_GAIN_AUTO, CONTEXT_BOARD.full_duplex, CONTEXT_SX1261.lbt_conf.enable);
     if (err != LGW_REG_SUCCESS) {
         printf("ERROR: failed to start AGC firmware\n");
         return LGW_HAL_ERROR;
@@ -1048,7 +1047,7 @@ int lgw_start(void) {
     }
 
     /* static TX configuration */
-    err = sx1302_tx_configure(CONTEXT_RF_CHAIN[CONTEXT_BOARD.clksrc].type);
+    err = sx1302_tx_configure(CONTEXT_RF_CHAIN[CONTEXT_BOARD.clksrc].radio_type);
     if (err != LGW_REG_SUCCESS) {
         printf("ERROR: failed to configure SX1302 TX path\n");
         return LGW_HAL_ERROR;
@@ -1257,8 +1256,6 @@ int lgw_receive(uint8_t max_pkt, struct lgw_pkt_rx_s *pkt_data) {
     /* performances variables */
     struct timeval tm;
 
-    DEBUG_PRINTF(" --- %s\n", "IN");
-
     /* Record function start time */
     _meas_time_start(&tm);
 
@@ -1328,8 +1325,6 @@ int lgw_receive(uint8_t max_pkt, struct lgw_pkt_rx_s *pkt_data) {
     }
 
     _meas_time_stop(1, tm, __FUNCTION__);
-
-    DEBUG_PRINTF(" --- %s\n", "OUT");
 
     return nb_pkt_found;
 }
@@ -1432,7 +1427,7 @@ int lgw_send(struct lgw_pkt_tx_s * pkt_data) {
     }
 
     /* Send the TX request to the concentrator */
-    err = sx1302_send(CONTEXT_RF_CHAIN[pkt_data->rf_chain].type, &CONTEXT_TX_GAIN_LUT[pkt_data->rf_chain], CONTEXT_LWAN_PUBLIC, &CONTEXT_FSK, pkt_data);
+    err = sx1302_send(CONTEXT_RF_CHAIN[pkt_data->rf_chain].radio_type, &CONTEXT_TX_GAIN_LUT[pkt_data->rf_chain], CONTEXT_LWAN_PUBLIC, &CONTEXT_FSK, pkt_data);
     if (err != LGW_REG_SUCCESS) {
         printf("ERROR: %s: Failed to send packet\n", __FUNCTION__);
 
@@ -1488,7 +1483,6 @@ int lgw_send(struct lgw_pkt_tx_s * pkt_data) {
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 int lgw_status(uint8_t rf_chain, uint8_t select, uint8_t *code) {
-    DEBUG_PRINTF(" --- %s\n", "IN");
 
     /* check input variables */
     CHECK_NULL(code);
@@ -1514,9 +1508,6 @@ int lgw_status(uint8_t rf_chain, uint8_t select, uint8_t *code) {
         DEBUG_MSG("ERROR: SELECTION INVALID, NO STATUS TO RETURN\n");
         return LGW_HAL_ERROR;
     }
-
-    DEBUG_PRINTF(" --- %s\n", "OUT");
-
     //DEBUG_PRINTF("INFO: STATUS %u\n", *code);
     return LGW_HAL_SUCCESS;
 }

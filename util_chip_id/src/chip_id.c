@@ -172,7 +172,7 @@ int main(int argc, char **argv)
     memset(&rfconf, 0, sizeof rfconf);
     rfconf.enable = true; /* rf chain 0 needs to be enabled for calibration to work on sx1257 */
     rfconf.freq_hz = 868500000; /* dummy */
-    rfconf.type = radio_type;
+    rfconf.radio_type  = radio_type;
     rfconf.tx_enable = false;
     rfconf.single_input_mode = false;
     if (lgw_rxrf_setconf(0, &rfconf) != LGW_HAL_SUCCESS) {
@@ -183,7 +183,7 @@ int main(int argc, char **argv)
     memset(&rfconf, 0, sizeof rfconf);
     rfconf.enable = (clocksource == 1) ? true : false;
     rfconf.freq_hz = 868500000; /* dummy */
-    rfconf.type = radio_type;
+    rfconf.radio_type  = radio_type;
     rfconf.tx_enable = false;
     rfconf.single_input_mode = false;
     if (lgw_rxrf_setconf(1, &rfconf) != LGW_HAL_SUCCESS) {

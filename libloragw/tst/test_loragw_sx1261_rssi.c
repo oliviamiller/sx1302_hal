@@ -224,7 +224,7 @@ int main(int argc, char ** argv)
     memset( &rfconf, 0, sizeof rfconf);
     rfconf.enable = true; /* must be enabled to proper RF matching */
     rfconf.freq_hz = fa;
-    rfconf.type = radio_type;
+    rfconf.radio_type  = radio_type;
     rfconf.rssi_offset = 0.0;
     rfconf.tx_enable = false;
     rfconf.single_input_mode = false;
@@ -236,7 +236,7 @@ int main(int argc, char ** argv)
     memset( &rfconf, 0, sizeof rfconf);
     rfconf.enable = true; /* must be enabled to proper RF matching */
     rfconf.freq_hz = fb;
-    rfconf.type = radio_type;
+       rfconf.radio_type  = radio_type;
     rfconf.rssi_offset = 0.0;
     rfconf.tx_enable = false;
     rfconf.single_input_mode = false;

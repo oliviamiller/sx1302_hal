@@ -64,6 +64,7 @@ typedef struct rx_packet_s {
     uint8_t     packet_checksum;
 } rx_packet_t;
 
+
 /**
 @struct rx_buffer_s
 @brief buffer to hold the data fetched from the sx1302 RX buffer

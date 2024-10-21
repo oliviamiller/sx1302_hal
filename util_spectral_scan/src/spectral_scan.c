@@ -237,7 +237,7 @@ int main(int argc, char **argv)
     memset(&rfconf, 0, sizeof rfconf);
     rfconf.enable = true;
     rfconf.freq_hz = 867500000; /* dummy */
-    rfconf.type = DEFAULT_RADIO_TYPE;
+    rfconf.radio_type = DEFAULT_RADIO_TYPE;
     rfconf.tx_enable = false;
     rfconf.single_input_mode = false;
     if (lgw_rxrf_setconf(0, &rfconf) != LGW_HAL_SUCCESS) {
@@ -248,7 +248,7 @@ int main(int argc, char **argv)
     memset(&rfconf, 0, sizeof rfconf);
     rfconf.enable = true;
     rfconf.freq_hz = 868500000; /* dummy */
-    rfconf.type = DEFAULT_RADIO_TYPE;
+    rfconf.radio_type = DEFAULT_RADIO_TYPE;
     rfconf.tx_enable = false;
     rfconf.single_input_mode = false;
     if (lgw_rxrf_setconf(1, &rfconf) != LGW_HAL_SUCCESS) {

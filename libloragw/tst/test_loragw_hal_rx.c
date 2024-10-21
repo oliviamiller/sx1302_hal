@@ -297,7 +297,7 @@ int main(int argc, char **argv)
     memset( &rfconf, 0, sizeof rfconf);
     rfconf.enable = true;
     rfconf.freq_hz = fa;
-    rfconf.type = radio_type;
+    rfconf.radio_type = radio_type;
     rfconf.rssi_offset = rssi_offset;
     rfconf.tx_enable = false;
     rfconf.single_input_mode = single_input_mode;
@@ -309,7 +309,7 @@ int main(int argc, char **argv)
     memset( &rfconf, 0, sizeof rfconf);
     rfconf.enable = true;
     rfconf.freq_hz = fb;
-    rfconf.type = radio_type;
+    rfconf.radio_type = radio_type;
     rfconf.rssi_offset = rssi_offset;
     rfconf.tx_enable = false;
     rfconf.single_input_mode = single_input_mode;
@@ -317,6 +317,7 @@ int main(int argc, char **argv)
         printf("ERROR: failed to configure rxrf 1\n");
         return EXIT_FAILURE;
     }
+
 
     /* set configuration for LoRa multi-SF channels (bandwidth cannot be set) */
     memset(&ifconf, 0, sizeof(ifconf));
