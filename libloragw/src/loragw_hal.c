@@ -1097,23 +1097,23 @@ int lgw_start(void) {
             ts_addr = I2C_PORT_TEMP_SENSOR[i];
             err = i2c_linuxdev_open(I2C_DEVICE, ts_addr, &ts_fd);
             if (err != LGW_I2C_SUCCESS) {
-                printf("ERROR: failed to open I2C for temperature sensor on port 0x%02X\n", ts_addr);
-                return LGW_HAL_ERROR;
+            //    printf("ERROR: failed to open I2C for temperature sensor on port 0x%02X\n", ts_addr);
+           //     return LGW_HAL_ERROR;
             }
 
             err = stts751_configure(ts_fd, ts_addr);
             if (err != LGW_I2C_SUCCESS) {
-                printf("INFO: no temperature sensor found on port 0x%02X\n", ts_addr);
+           //     printf("INFO: no temperature sensor found on port 0x%02X\n", ts_addr);
                 i2c_linuxdev_close(ts_fd);
                 ts_fd = -1;
             } else {
-                printf("INFO: found temperature sensor on port 0x%02X\n", ts_addr);
+              //  printf("INFO: found temperature sensor on port 0x%02X\n", ts_addr);
                 break;
             }
         }
         if (i == sizeof I2C_PORT_TEMP_SENSOR) {
-            printf("ERROR: no temperature sensor found.\n");
-            return LGW_HAL_ERROR;
+          //  printf("ERROR: no temperature sensor found.\n");
+           // return LGW_HAL_ERROR;
         }
 
         /* Configure ADC AD338R for full duplex (CN490 reference design) */
@@ -1221,12 +1221,14 @@ int lgw_stop(void) {
     }
 
     if (CONTEXT_COM_TYPE == LGW_COM_SPI) {
-        DEBUG_MSG("INFO: Closing I2C for temperature sensor\n");
-        x = i2c_linuxdev_close(ts_fd);
-        if (x != 0) {
-            printf("ERROR: failed to close I2C temperature sensor device (err=%i)\n", x);
-            err = LGW_HAL_ERROR;
-        }
+       if (ts_fd != -1) {
+            DEBUG_MSG("INFO: Closing I2C for temperature sensor\n");
+            x = i2c_linuxdev_close(ts_fd);
+            if (x != 0) {
+                printf("ERROR: failed to close I2C temperature sensor device (err=%i)\n", x);
+                err = LGW_HAL_ERROR;
+            }
+       }
 
         if (CONTEXT_BOARD.full_duplex == true) {
             DEBUG_MSG("INFO: Closing I2C for AD5338R\n");
@@ -1285,9 +1287,9 @@ int lgw_receive(uint8_t max_pkt, struct lgw_pkt_rx_s *pkt_data) {
 
     /* Apply RSSI temperature compensation */
     res = lgw_get_temperature(&current_temperature);
-    if (res != LGW_I2C_SUCCESS) {
-        printf("ERROR: failed to get current temperature\n");
-        return LGW_HAL_ERROR;
+   if (res != LGW_I2C_SUCCESS) {
+      //  printf("ERROR: failed to get current temperature\n");
+       // return LGW_HAL_ERROR;
     }
 
     /* Iterate on the RX buffer to get parsed packets */
